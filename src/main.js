@@ -1,3 +1,5 @@
+import * as addTracker from "./tracker.js";
+
 let fps = 20;
 let prevLarge = true;
 
@@ -21,7 +23,8 @@ const loop = () => {
 }
 
 const setup = () => {
-  
+  let mainButton = document.getElementById("mainButton");
+  mainButton.onclick = addTracker;
 }
 
 export { 
