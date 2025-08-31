@@ -6,7 +6,7 @@ let prevLarge = true;
 const init = () => {
   // Loop if needed
 //   loop();
-  setup()
+  setup();
 }
 
 const loop = () => {
@@ -24,7 +24,7 @@ const loop = () => {
 
 const setup = () => {
   let mainButton = document.getElementById("mainButton");
-  mainButton.onclick = addTracker;
+  mainButton.onclick = addTracker.addTracker;
 }
 
 export { 
