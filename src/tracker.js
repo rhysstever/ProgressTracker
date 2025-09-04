@@ -1,60 +1,102 @@
-let trackers = [];
 let isTrackerMenuOpen = false;
 let currentTrackerSettings = -1;
 
-const addTracker = () => {
-  // Tracker Title
-  let title = document.createElement("h2");
-  let titleText = document.createTextNode("New Tracker");
-  title.appendChild(titleText);
-  let trackerId = "tracker" + trackers.length;
-
-  // Tracker Settings Button
-  let settingsButton = document.createElement("button");
-  let settingsText = document.createTextNode("Settings");
-  settingsButton.appendChild(settingsText);
-  settingsButton.onclick = function() { toggleTrackerMenu(trackerId); };
-
-  // Remove Tracker Button
-  let removeButton = document.createElement("button");
-  let removeText = document.createTextNode("Remove");
-  removeButton.appendChild(removeText);
-  removeButton.className = "removeButton";
-  removeButton.onclick = function() { removeTracker(trackerId); };
-
-  // Create the tracker div and add it to the array and DOM
-  let newTracker = document.createElement("div");
-  newTracker.appendChild(title);
-  newTracker.appendChild(settingsButton);
-  newTracker.appendChild(removeButton);
-  newTracker.id = trackerId;
-  trackers.push(newTracker);
-
-  // Append to the trackers div
-  let trackersDiv = document.getElementById("trackers");
-  trackersDiv.appendChild(newTracker);
+const getTrackers = () => {
+  var trackers;
+  if(!localStorage.getItem("trackers")) {
+    trackers = [];
+  } else {
+    trackers = JSON.parse(localStorage.getItem("trackers"));
   }
+  return trackers;
+}
 
-const removeTracker = (trackerId) => {
+const addTracker = () => {
+  // Get the current list of trackers
+  let trackers = getTrackers();
+
+  // Create the new tracker
+  let newTracker = {
+    id: "tracker" + trackers.length
+  };
+  
+  // Add it to the trackers array and update the new array to localStorage
+  trackers.push(newTracker);
+  localStorage.setItem("trackers", JSON.stringify(trackers));
+
+  // Display the trackers
+  displayTrackers(trackers);
+}
+
+const removeTracker = (trackerId) => {  
+  // Find the number index from the tracker's id
   console.log("Removing: " + trackerId);
   let index = parseInt(trackerId.toString().substring("tracker".length));
 
-  // Remove the tracker from the DOM and the array
-  let tracker = document.getElementById(trackerId);
-  tracker.remove();
+  // If the index is 
+  if(index == -1) {
+    console.log("Error! Tracker not found from ID");
+    return;
+  }
+
+  // If the index of the removed tracker is the one with settings open, close the menu
+  if (currentTrackerSettings === trackerId) {
+    toggleTrackerMenu(trackerId);
+  }
+
+  // Get the current list of trackers
+  let trackers = getTrackers();
+
+  // Remove the tracker at the given index
   trackers.splice(index, 1);
 
   // Update the IDs of the remaining trackers
   for (let i = 0; i < trackers.length; i++) {
     let newId = "tracker" + i;
     trackers[i].id = newId;
-    // Update the onclick functions to use the new IDs
-    trackers[i].querySelector(".removeButton").onclick = function() { removeTracker(newId); };
   }
 
-  // If the removed tracker was the one with settings open, close the menu
-  if (currentTrackerSettings === trackerId) {
-    toggleTrackerMenu(trackerId);
+  // Update the new array to localStorage
+  localStorage.setItem("trackers", JSON.stringify(trackers));
+
+  // Display the updated trackers
+  displayTrackers(trackers);
+}
+
+const displayTrackers = (trackers) => {
+  let trackersDiv = document.getElementById("trackers");
+  trackersDiv.textContent = '';
+
+  for(let i = 0; i < trackers.length; i++) {
+    let trackerId = trackers[i].id;
+
+    // Tracker Title
+    let title = document.createElement("h2");
+    let titleText = document.createTextNode("Tracker " + trackerId);
+    title.appendChild(titleText);
+
+    // Tracker Settings Button
+    let settingsButton = document.createElement("button");
+    let settingsText = document.createTextNode("Settings");
+    settingsButton.appendChild(settingsText);
+    settingsButton.onclick = function() { toggleTrackerMenu(trackerId); };
+
+    // Remove Tracker Button
+    let removeButton = document.createElement("button");
+    let removeText = document.createTextNode("Remove");
+    removeButton.appendChild(removeText);
+    removeButton.className = "removeButton";
+    removeButton.onclick = function() { removeTracker(trackerId); };
+
+    // Create the tracker div and add it to the array and DOM
+    let newTracker = document.createElement("div");
+    newTracker.appendChild(title);
+    newTracker.appendChild(settingsButton);
+    newTracker.appendChild(removeButton);
+    newTracker.id = "tracker" + trackerId;
+
+    // Append to the trackers div
+    trackersDiv.appendChild(newTracker);
   }
 }
 
@@ -80,7 +122,8 @@ const toggleTrackerMenu = (trackInfo) => {
   }
 }
 
-export {
-  trackers,
-  addTracker
+export { 
+  getTrackers, 
+  addTracker,
+  displayTrackers
 };

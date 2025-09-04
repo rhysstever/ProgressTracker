@@ -1,4 +1,5 @@
-import * as addTracker from "./tracker.js";
+import * as storage from "./storage.js"
+import * as tracker from "./tracker.js";
 
 let fps = 20;
 let prevLarge = true;
@@ -6,7 +7,17 @@ let prevLarge = true;
 const init = () => {
   // Loop if needed
 //   loop();
-  setup();
+  setupInitialButtons();
+
+  // Check for local storage availability
+  if (storage.storageAvailable("localStorage")) {
+    // localStorage is available
+    
+    // Display exisiting trackers
+    tracker.displayTrackers(tracker.getTrackers());
+  } else {
+    // no localStorage
+  }
 }
 
 const loop = () => {
@@ -22,11 +33,9 @@ const loop = () => {
   requestAnimationFrame(loop, 1000 / fps);
 }
 
-const setup = () => {
+const setupInitialButtons = () => {
   let mainButton = document.getElementById("mainButton");
-  mainButton.onclick = addTracker.addTracker;
+  mainButton.onclick = tracker.addTracker;
 }
 
-export { 
-  init
-};
+export { init };
